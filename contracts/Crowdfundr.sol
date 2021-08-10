@@ -26,26 +26,28 @@ contract Project is Ownable {
         goal = _goal;
     }
 
+    /// @notice ensures contract is unlocked
     modifier isUnlocked {
         require(!locked, 'the project is currently locked');
         _;
     }
+    /// @notice ensures contract is locked
     modifier isLocked {
         require(locked, 'the project is currently unlocked');
         _;
     }
-
+    /// @notice emits event when the contract is cancled
     event cancled (bool cancled, address owner);
 
     /// @notice for creators to lock their project in order to withdraw funds
-    function lockOwner (string memory _name) public onlyOwner isUnlocked {
+    function lockOwner () public onlyOwner isUnlocked {
         require(totalFunds >= goal);
         locked = true;
         success = true;
     }
 
     /// @notice for creators to cancle the project
-    function cancle (string memory _name) public onlyOwner isUnlocked {
+    function cancle () public onlyOwner isUnlocked {
         require(block.timestamp < expirationDate);
         success = false;
         locked = true;
@@ -53,7 +55,7 @@ contract Project is Ownable {
     }
 
     /// @notice for users to lock if the goal has not been met after 30 days
-    function lockContributor (string memory _name) public isUnlocked {
+    function lockContributor () public isUnlocked {
         require(block.timestamp > expirationDate);
         require(totalFunds < goal);
         locked = true;
@@ -63,7 +65,7 @@ contract Project is Ownable {
 
 
     /// @notice  for contributors to withdraw their funds if the goal has not been met
-    function withdrawContributor (string memory _name) public isLocked {
+    function withdrawContributor () public isLocked {
         require(!success, 'crowdfundr was successful');
         uint amount = balances[msg.sender];
         require(amount >= 0.01 ether);
@@ -74,6 +76,7 @@ contract Project is Ownable {
     }
 
     /// @notice  for creators to withdraw funds after the goal has been met
+    /// @param amount the amount of ether to withdraw from totalFunds
     function withdrawOwner (uint amount) public onlyOwner isLocked {
         require(success, 'crowdfundr was unsuccessful');
         require (amount <= totalFunds);
@@ -99,7 +102,12 @@ contract Crowdfundr {
 
     Project[] public projects;
 
-    /// @notice  creators can register a new project, takes in a name and an array of creators
+    /**  
+    * @notice  creators can register a new project, takes in a name and an array of creators
+    * @param _goal the amount of ether intended to raise
+    * @param _daysToExpiration the number of days to raise the goal
+    * @return address of newProject contract
+     */
     function createProject (uint _goal, uint _daysToExpiration) public returns (address project) {
         Project newProject = new Project(_goal, _daysToExpiration);
         newProject.transferOwnership(msg.sender);
