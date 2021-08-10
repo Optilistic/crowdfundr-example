@@ -62,13 +62,22 @@ contract Project is Ownable {
 
     /// @notice  for contributors to withdraw their funds if the goal has not been met
     function withdrawContributor (string memory _name) public isLocked {
-        require(!success, 'crowdfundr was unsuccessful');
+        require(!success, 'crowdfundr was successful');
+        uint amount = balances[msg.sender];
+        require(amount >= 0.01 ether);
+        totalFunds.sub(amount);
+        balances[msg.sender] = 0;
+        (bool success, bytes memory data) = msg.sender.call{value: amount}("");
+        require(success, 'withdraw: Transfer Failed');
     }
 
     /// @notice  for creators to withdraw funds after the goal has been met
-    function withdrawOwner (string memory _name) public onlyOwner isLocked {
+    function withdrawOwner (uint amount) public onlyOwner isLocked {
         require(success, 'crowdfundr was unsuccessful');
-
+        require (amount <= totalFunds);
+        totalFunds.sub(amount);
+        (bool success, bytes memory data) = msg.sender.call{value: amount}("");
+        require(success, 'withdraw: Transfer Failed');
     }
 
     /// @notice users can contribute to the Project
