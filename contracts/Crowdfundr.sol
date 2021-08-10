@@ -20,8 +20,10 @@ contract Project is Ownable {
     bool public locked;
     bool public success;
 
-    constructor(uint _daysToExpiration) {
+    constructor(uint _goal, uint _daysToExpiration) {
+        require(_daysToExpiration < 90 days, 'cannot take longer than 90 days');
         expirationDate = block.timestamp + _daysToExpiration;
+        goal = _goal;
     }
 
     modifier isUnlocked {
@@ -92,15 +94,17 @@ contract Project is Ownable {
 }
 
 /// @title Crowdfundr
-
+/// @notice Project factory, stores an array of all projects 
 contract Crowdfundr {
 
-
-
+    Project[] public projects;
 
     /// @notice  creators can register a new project, takes in a name and an array of creators
-    function createProject (string memory _name, address _creator) public {
-
+    function createProject (uint _goal, uint _daysToExpiration) public returns (address project) {
+        Project newProject = new Project(_goal, _daysToExpiration);
+        newProject.transferOwnership(msg.sender);
+        projects.push(newProject);
+        return address(newProject);
     }
 
 }
