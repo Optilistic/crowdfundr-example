@@ -108,6 +108,11 @@ describe("Crowdfundr", function () {
     expect(totalFunds).to.equal(parseEther('6'))
   });
 
+  it("Should revert if users contribute to a project that has already met its goal", async function () {
+    let project = await createGenericProject()
+    await assert.revert(multipleUsersContribute(project.address, 5))
+  });
+
   it("Should not allow the owner to lock the contract if the goal has not been met", async function () {
     let project = await createGenericProject()
     await multipleUsersContribute(project.address, 1)
