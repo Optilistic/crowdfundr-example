@@ -1,8 +1,14 @@
 pragma solidity ^0.8.4;
 /// @author dd0sxx
 
-    //planned usage:
-        // creators can call createProject
+    /// @dev planned usage:
+        // creators can call createProject and set a goal and time limit
+            // users can contribute to the contract while the contract is unlocked
+            // the contract can be locked after the goal is met by the owner, or by the users if the contract does not meet its goal by the end of the time limit
+            // the contract can also be cancled by the owner at any time while it is unlocked
+            // after the contract is locked, the bool success will determine if the project met its goal or not
+                // users can withdraw their contributions if the project failed
+                // creators can withdraw the funds if the project succeeded
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -106,13 +112,16 @@ contract Crowdfundr {
     * @notice  creators can register a new project, takes in a name and an array of creators
     * @param _goal the amount of ether intended to raise
     * @param _daysToExpiration the number of days to raise the goal
-    * @return address of newProject contract
      */
     function createProject (uint _goal, uint _daysToExpiration) public returns (address project) {
         Project newProject = new Project(_goal, _daysToExpiration);
         newProject.transferOwnership(msg.sender);
         projects.push(newProject);
-        return address(newProject);
+        return payable(newProject);
+    }
+
+    function getProjects () external view returns (Project[] memory) {
+        return projects;
     }
 
 }
