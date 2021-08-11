@@ -26,6 +26,24 @@ describe("Crowdfundr", function () {
     return await ethers.getContractAt("Project", address);
   }
 
+  const multipleUsersContribute = async function (address, amount) {
+    await alice.sendTransaction({
+      from: alice.address,
+      to: address,
+      value: ethers.utils.parseEther(`${amount}`),
+    })
+    await bob.sendTransaction({
+      from: bob.address,
+      to: address,
+      value: ethers.utils.parseEther(`${amount * 2}`),
+    })
+    await charlotte.sendTransaction({
+      from: charlotte.address,
+      to: address,
+      value: ethers.utils.parseEther(`${amount * 3}`),
+    })
+  }
+
   it("Should test compilation and deployment", async function () {
     expect(await crowdfundr).to.not.equal(undefined);
   });
@@ -55,7 +73,11 @@ describe("Crowdfundr", function () {
     expect(await project2.owner()).to.deep.equal(bob.address)
   });
 
-  it("Should ", async function () {
+  it("Should allow users to contribute to a project", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 1)
+    let totalFunds = await project.totalFunds()
+    expect(totalFunds).to.equal(parseEther('6'))
   });
 
 });

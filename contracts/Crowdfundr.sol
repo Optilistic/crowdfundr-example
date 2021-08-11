@@ -30,6 +30,7 @@ contract Project is Ownable {
         require(_daysToExpiration < 90 days, 'cannot take longer than 90 days');
         expirationDate = block.timestamp + _daysToExpiration;
         goal = _goal;
+        locked = false;
     }
 
     /// @notice ensures contract is unlocked
