@@ -119,11 +119,18 @@ describe("Crowdfundr", function () {
     await assert.revert(project.lockOwner())
   });
 
-  it("Should llow the owner to lock the contract if the goal has been met", async function () {
+  it("Should allow the owner to lock the contract if the goal has been met", async function () {
     let project = await createGenericProject()
     await multipleUsersContribute(project.address, 3)
     await project.lockOwner()
     expect(await project.locked()).to.deep.equal(true)
+  });
+
+  it("Should allow the owner to cancle the project", async function () {
+    let project = await createGenericProject()
+    await project.cancle()
+    expect(await project.locked()).to.deep.equal(true)
+    expect(await project.success()).to.deep.equal(false)
   });
 
 });
