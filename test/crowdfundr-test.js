@@ -1,6 +1,27 @@
-const { expect } = require("chai")
+let { expect, assert } = require("chai")
 const {utils} = ethers
 const {parseEther} = utils
+
+const assertRevert = async (blockOrPromise, reason) => {
+  let errorCaught = false;
+  try {
+      const result = typeof blockOrPromise === 'function' ? blockOrPromise() : blockOrPromise;
+      await result;
+  } catch (error) {
+    assert.include(error.message, 'revert');
+      if (reason) {
+        assert.include(error.message, reason);
+      }
+      errorCaught = true;
+  }
+
+  assert.strictEqual(errorCaught, true, 'Operation did not revert as expected');
+}
+
+assert =  Object.assign({}, assert, {
+  revert: assertRevert
+})
+
 
 describe("Crowdfundr", function () {
 
@@ -78,6 +99,26 @@ describe("Crowdfundr", function () {
     await multipleUsersContribute(project.address, 1)
     let totalFunds = await project.totalFunds()
     expect(totalFunds).to.equal(parseEther('6'))
+  });
+
+  it("Should allow users to contribute to a project", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 1)
+    let totalFunds = await project.totalFunds()
+    expect(totalFunds).to.equal(parseEther('6'))
+  });
+
+  it("Should not allow the owner to lock the contract if the goal has not been met", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 1)
+    await assert.revert(project.lockOwner())
+  });
+
+  it("Should llow the owner to lock the contract if the goal has been met", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 3)
+    await project.lockOwner()
+    expect(await project.locked()).to.deep.equal(true)
   });
 
 });

@@ -48,7 +48,7 @@ contract Project is Ownable {
 
     /// @notice for creators to lock their project in order to withdraw funds
     function lockOwner () public onlyOwner isUnlocked {
-        require(totalFunds >= goal);
+        require(totalFunds >= goal, 'goal has not been reached yet');
         locked = true;
         success = true;
     }
