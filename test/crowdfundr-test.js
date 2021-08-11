@@ -19,8 +19,11 @@ describe("Crowdfundr", function () {
     crowdfundr = await Crowdfundr.deploy()
   })
 
-  const createGenericProject = async () => {
-    await crowdfundr.createProject(parseEther('10'), 30)
+  const createGenericProject = async (signer = alice) => {
+    let project = await crowdfundr.connect(signer).createProject(parseEther('10'), 30)
+    let res = await project.wait()
+    let address = res.events[0].address
+    return await ethers.getContractAt("Project", address);
   }
 
   it("Should test compilation and deployment", async function () {
@@ -37,13 +40,22 @@ describe("Crowdfundr", function () {
     let projects = await crowdfundr.getProjects()
     expect(projects.length).to.deep.equal(1)
   });
+  
+  it("Should correclty assign an owner to the new project", async function () {
+    let project1 = await createGenericProject()
+    // let project2 = await createGenericProject(bob)
+    expect(await project1.owner()).to.deep.equal(alice.address)
+    // expect(await project2.owner).to.deep.equal(bob.address)
+  });
 
-  it("Should ", async function () {
-    
+  it("Should correclty assign an owner to multiple projects", async function () {
+    let project1 = await createGenericProject()
+    let project2 = await createGenericProject(bob)
+    expect(await project1.owner()).to.deep.equal(alice.address)
+    expect(await project2.owner()).to.deep.equal(bob.address)
   });
 
   it("Should ", async function () {
-    
   });
 
 });
