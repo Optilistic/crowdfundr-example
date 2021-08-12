@@ -155,4 +155,16 @@ describe("Crowdfundr", function () {
     expect(res).to.deep.equal(true)
   });
 
+  it("Should allow the contributers to withdraw funds if the goal has not been met and the contract is locked", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 1)
+    await hre.ethers.provider.send('evm_increaseTime', [20 * 24 * 60 * 60])
+    await project.connect(charlotte).lockContributor()
+    let balanceBefore = await hre.ethers.provider.getBalance(charlotte.address)
+    await project.connect(charlotte).withdrawContributor()
+    let balanceAfter = await hre.ethers.provider.getBalance(charlotte.address)
+    let res = Number(`${balanceBefore}`) < Number(`${balanceAfter}`)
+    expect(res).to.deep.equal(true)
+  });
+
 });
