@@ -126,6 +126,17 @@ describe("Crowdfundr", function () {
     expect(await project.locked()).to.deep.equal(true)
   });
 
+  it("Should allow a contributor to lock the contract if the goal has not been met", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 1)
+    await hre.ethers.provider.send('evm_increaseTime', [20 * 24 * 60 * 60])
+    await project.lockContributor()
+    expect(await project.locked()).to.deep.equal(true)
+    expect(await project.success()).to.deep.equal(false)
+  });
+
+  
+
   it("Should allow the owner to cancle the project", async function () {
     let project = await createGenericProject()
     await project.cancle()

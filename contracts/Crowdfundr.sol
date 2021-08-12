@@ -63,8 +63,9 @@ contract Project is Ownable {
 
     /// @notice for users to lock if the goal has not been met after 30 days
     function lockContributor () public isUnlocked {
-        require(block.timestamp > expirationDate);
-        require(totalFunds < goal);
+        require(block.timestamp > expirationDate, 'project has not yet expired');
+        require(totalFunds < goal, 'goal has not been met');
+        require(balances[msg.sender] >= 0.1 ether, 'you have not contributed');
         locked = true;
         success = false;
     }
