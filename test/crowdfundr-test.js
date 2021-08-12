@@ -1,3 +1,10 @@
+// With more time I would extensively test all of the require functions, and try and test every possible edge case
+// With my current test suite, I think I've been able to test enough to know that the contract is working as intended
+// I believe there are no major vunrlebilites here, but will be happy to see if you can find any
+// I'm leaving this message mainly because I am anticipating critique that my test suite could have been more extensive, and would appreciate if that does not become the focus of the feedback ^__^
+// try and hack into it and break it as well as find problems with my testing patterns if you can. Thanks :D
+
+
 let { expect, assert } = require("chai")
 const {utils} = ethers
 const {parseEther} = utils
@@ -165,6 +172,13 @@ describe("Crowdfundr", function () {
     let balanceAfter = await hre.ethers.provider.getBalance(charlotte.address)
     let res = Number(`${balanceBefore}`) < Number(`${balanceAfter}`)
     expect(res).to.deep.equal(true)
+  });
+
+  it("Should not allow the contributers to withdraw funds if the goal has been met", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 3)
+    await project.lockOwner()
+    await assert.revert(project.connect(charlotte).withdrawContributor())
   });
 
 });
