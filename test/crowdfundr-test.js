@@ -130,18 +130,29 @@ describe("Crowdfundr", function () {
     let project = await createGenericProject()
     await multipleUsersContribute(project.address, 1)
     await hre.ethers.provider.send('evm_increaseTime', [20 * 24 * 60 * 60])
-    await project.lockContributor()
+    await project.connect(charlotte).lockContributor()
     expect(await project.locked()).to.deep.equal(true)
     expect(await project.success()).to.deep.equal(false)
   });
 
-  
 
   it("Should allow the owner to cancle the project", async function () {
     let project = await createGenericProject()
     await project.cancle()
     expect(await project.locked()).to.deep.equal(true)
     expect(await project.success()).to.deep.equal(false)
+  });
+
+  it("Should allow the owner to withdraw funds if the goal has been met and the contract is locked", async function () {
+    let project = await createGenericProject()
+    await multipleUsersContribute(project.address, 3)
+    await project.lockOwner()
+    let balanceBefore = await hre.ethers.provider.getBalance(alice.address)
+    let totalFunds = await project.totalFunds()
+    await project.withdrawOwner(`${totalFunds}`)
+    let balanceAfter = await hre.ethers.provider.getBalance(alice.address)
+    let res = Number(`${balanceBefore}`) < Number(`${balanceAfter}`)
+    expect(res).to.deep.equal(true)
   });
 
 });
