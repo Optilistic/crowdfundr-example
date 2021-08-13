@@ -78,7 +78,7 @@ contract Project is Ownable {
         require(!success, 'crowdfundr was successful');
         uint amount = balances[msg.sender];
         require(amount >= minimumEther);
-        totalFunds.sub(amount);
+        totalFunds = totalFunds.sub(amount);
         balances[msg.sender] = 0;
         (bool success, bytes memory data) = msg.sender.call{value: amount}("");
         require(success, 'withdraw: Transfer Failed');
@@ -89,7 +89,7 @@ contract Project is Ownable {
     function withdrawOwner (uint amount) public onlyOwner isLocked {
         require(success, 'crowdfundr was unsuccessful');
         require (amount <= totalFunds);
-        totalFunds.sub(amount);
+        totalFunds = totalFunds.sub(amount);
         (bool success, bytes memory data) = msg.sender.call{value: amount}("");
         require(success, 'withdraw: Transfer Failed');
     }
