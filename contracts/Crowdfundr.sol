@@ -65,7 +65,7 @@ contract Project is Ownable {
     function lockContributor () public isUnlocked {
         require(block.timestamp > expirationDate, 'project has not yet expired');
         require(totalFunds < goal, 'goal has not been met');
-        require(balances[msg.sender] >= 0.1 ether, 'you have not contributed');
+        require(balances[msg.sender] >= 0.01 ether, 'you have not contributed');
         locked = true;
         success = false;
     }
