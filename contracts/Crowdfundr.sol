@@ -76,8 +76,8 @@ contract Project is Ownable {
         require(amount >= minimumEther);
         totalFunds = totalFunds - amount;
         balances[msg.sender] = 0;
-        (bool success, bytes memory data) = msg.sender.call{value: amount}("");
-        require(success, 'withdraw: Transfer Failed');
+        (bool result, bytes memory data) = msg.sender.call{value: amount}("");
+        require(result, 'withdraw: Transfer Failed');
     }
 
     /// @notice  for creators to withdraw funds after the goal has been met
@@ -86,8 +86,8 @@ contract Project is Ownable {
         require(success, 'crowdfundr was unsuccessful');
         require (amount <= totalFunds);
         totalFunds = totalFunds - amount;
-        (bool success, bytes memory data) = msg.sender.call{value: amount}("");
-        require(success, 'withdraw: Transfer Failed');
+        (bool result, bytes memory data) = msg.sender.call{value: amount}("");
+        require(result, 'withdraw: Transfer Failed');
     }
 
     /// @notice users can contribute to the Project
