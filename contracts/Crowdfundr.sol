@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
         // creators can call createProject and set a goal and time limit
             // users can contribute to the contract while the contract is unlocked
             // the contract can be locked after the goal is met by the owner, or by the users if the contract does not meet its goal by the end of the time limit
-            // the contract can also be cancled by the owner at any time while it is unlocked
+            // the contract can also be canceled by the owner at any time while it is unlocked
             // after the contract is locked, the bool success will determine if the project met its goal or not
                 // users can withdraw their contributions if the project failed
                 // creators can withdraw the funds if the project succeeded
@@ -43,8 +43,8 @@ contract Project is Ownable {
         require(locked, 'the project is currently unlocked');
         _;
     }
-    /// @notice emits event when the contract is cancled
-    event cancled (bool cancled, address owner);
+    /// @notice emits event when the contract is canceled
+    event canceled (bool canceled, address owner);
 
     /// @notice for creators to lock their project in order to withdraw funds
     function lockOwner () public onlyOwner isUnlocked {
@@ -53,12 +53,12 @@ contract Project is Ownable {
         success = true;
     }
 
-    /// @notice for creators to cancle the project
-    function cancle () public onlyOwner isUnlocked {
+    /// @notice for creators to cancel the project
+    function cancel () public onlyOwner isUnlocked {
         require(block.timestamp < expirationDate);
         success = false;
         locked = true;
-        emit cancled(true, msg.sender);
+        emit canceled(true, msg.sender);
     }
 
     /// @notice for users to lock if the goal has not been met after 30 days

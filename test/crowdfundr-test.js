@@ -143,9 +143,9 @@ describe("Crowdfundr", function () {
   });
 
 
-  it("Should allow the owner to cancle the project", async function () {
+  it("Should allow the owner to cancel the project", async function () {
     let project = await createGenericProject()
-    await project.cancle()
+    await project.cancel()
     expect(await project.locked()).to.deep.equal(true)
     expect(await project.success()).to.deep.equal(false)
   });
