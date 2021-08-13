@@ -96,6 +96,7 @@ contract Project is Ownable {
 
     /// @notice users can contribute to the Project
     fallback () external payable {
+        require(msg.data.length == 0);
         require(msg.value >= minimumEther, 'value was less than 0.01 ether');
         require(!locked, 'project is locked');
         require(totalFunds < goal, 'the project has already met its goal');
