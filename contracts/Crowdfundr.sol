@@ -44,14 +44,14 @@ contract Project is Ownable {
     event canceled (bool canceled, address owner);
 
     /// @notice for creators to lock their project in order to withdraw funds
-    function lockOwner () public onlyOwner isUnlocked {
+    function lockOwner () external onlyOwner isUnlocked {
         require(totalFunds >= goal, 'goal has not been reached yet');
         locked = true;
         success = true;
     }
 
     /// @notice for creators to cancel the project
-    function cancel () public onlyOwner isUnlocked {
+    function cancel () external onlyOwner isUnlocked {
         require(block.timestamp < expirationDate);
         success = false;
         locked = true;
@@ -59,7 +59,7 @@ contract Project is Ownable {
     }
 
     /// @notice for users to lock if the goal has not been met after 30 days
-    function lockContributor () public isUnlocked {
+    function lockContributor () external isUnlocked {
         require(block.timestamp > expirationDate, 'project has not yet expired');
         require(totalFunds < goal, 'goal has not been met');
         require(balances[msg.sender] >= minimumEther, 'you have not contributed');
@@ -70,7 +70,7 @@ contract Project is Ownable {
 
 
     /// @notice  for contributors to withdraw their funds if the goal has not been met
-    function withdrawContributor () public isLocked {
+    function withdrawContributor () external isLocked {
         require(!success, 'crowdfundr was successful');
         uint amount = balances[msg.sender];
         require(amount >= minimumEther);
@@ -82,7 +82,7 @@ contract Project is Ownable {
 
     /// @notice  for creators to withdraw funds after the goal has been met
     /// @param amount the amount of ether to withdraw from totalFunds
-    function withdrawOwner (uint amount) public onlyOwner isLocked {
+    function withdrawOwner (uint amount) external onlyOwner isLocked {
         require(success, 'crowdfundr was unsuccessful');
         require (amount <= totalFunds);
         totalFunds = totalFunds - amount;
