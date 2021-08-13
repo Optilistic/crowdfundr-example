@@ -9,8 +9,6 @@ pragma solidity ^0.8.4;
             // after the contract is locked, the bool success will determine if the project met its goal or not
                 // users can withdraw their contributions if the project failed
                 // creators can withdraw the funds if the project succeeded
-
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @title Project
@@ -78,7 +76,7 @@ contract Project is Ownable {
         require(!success, 'crowdfundr was successful');
         uint amount = balances[msg.sender];
         require(amount >= minimumEther);
-        totalFunds = totalFunds.sub(amount);
+        totalFunds = totalFunds - amount;
         balances[msg.sender] = 0;
         (bool success, bytes memory data) = msg.sender.call{value: amount}("");
         require(success, 'withdraw: Transfer Failed');
@@ -89,7 +87,7 @@ contract Project is Ownable {
     function withdrawOwner (uint amount) public onlyOwner isLocked {
         require(success, 'crowdfundr was unsuccessful');
         require (amount <= totalFunds);
-        totalFunds = totalFunds.sub(amount);
+        totalFunds = totalFunds - amount;
         (bool success, bytes memory data) = msg.sender.call{value: amount}("");
         require(success, 'withdraw: Transfer Failed');
     }
@@ -100,8 +98,8 @@ contract Project is Ownable {
         require(msg.value >= minimumEther, 'value was less than 0.01 ether');
         require(!locked, 'project is locked');
         require(totalFunds < goal, 'the project has already met its goal');
-        totalFunds = totalFunds.add(msg.value);
-        balances[msg.sender] = balances[msg.sender].add(msg.value);
+        totalFunds = totalFunds + msg.value;
+        balances[msg.sender] = balances[msg.sender] + msg.value;
 
     }
 }
