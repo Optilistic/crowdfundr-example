@@ -15,8 +15,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /// @notice Will serve as a class for each Project instance
 contract Project is Ownable {
 
-    using SafeMath for uint;
-
     mapping(address => uint) public balances;
     uint public expirationDate;
     uint public totalFunds;
