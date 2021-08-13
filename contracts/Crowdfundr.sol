@@ -23,6 +23,7 @@ contract Project is Ownable {
     uint public expirationDate;
     uint public totalFunds;
     uint public goal;
+    uint public constant minimumEther = 0.01 ether;
     bool public locked;
     bool public success;
 
@@ -65,7 +66,7 @@ contract Project is Ownable {
     function lockContributor () public isUnlocked {
         require(block.timestamp > expirationDate, 'project has not yet expired');
         require(totalFunds < goal, 'goal has not been met');
-        require(balances[msg.sender] >= 0.01 ether, 'you have not contributed');
+        require(balances[msg.sender] >= minimumEther, 'you have not contributed');
         locked = true;
         success = false;
     }
@@ -76,7 +77,7 @@ contract Project is Ownable {
     function withdrawContributor () public isLocked {
         require(!success, 'crowdfundr was successful');
         uint amount = balances[msg.sender];
-        require(amount >= 0.01 ether);
+        require(amount >= minimumEther);
         totalFunds.sub(amount);
         balances[msg.sender] = 0;
         (bool success, bytes memory data) = msg.sender.call{value: amount}("");
@@ -95,7 +96,7 @@ contract Project is Ownable {
 
     /// @notice users can contribute to the Project
     fallback () external payable {
-        require(msg.value >= 0.01 ether, 'value was less than 0.01 ether');
+        require(msg.value >= minimumEther, 'value was less than 0.01 ether');
         require(!locked, 'project is locked');
         require(totalFunds < goal, 'the project has already met its goal');
         totalFunds = totalFunds.add(msg.value);
